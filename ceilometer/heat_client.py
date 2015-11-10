@@ -12,9 +12,11 @@
 # under the License.
 
 import functools
+import urlparse
 
 from heatclient import client as heat_client
 from oslo_config import cfg
+from ceilometer import keystone_client
 from ceilometer.openstack.common import log
 
 SERVICE_OPTS = [
@@ -46,19 +48,25 @@ def logged(func):
 class Client(object):
     """A client which gets information via python-heatclient."""
 
-    def __init__(self, bypass_url=None, auth_token=None):
+    def __init__(self):
         conf = cfg.CONF.service_credentials
+
+        api_version = '1'
+        heat_url = keystone_client.get_client().service_catalog.url_for(
+                    service_type=cfg.CONF.service_types.heat,
+                    endpoint_type=conf.os_endpoint_type)
+        endpoint = urlparse.urljoin(heat_url, '/admin')
 
         params = {
             'insecure': conf.insecure,
-            'ca_cert': conf.os_cacert,
+            'ca_file': conf.os_cacert,
             'username': conf.os_username,
             'password': conf.os_password,
             'auth_url': conf.os_auth_url,
             'region_name': conf.os_region_name,
             'endpoint_type': conf.os_endpoint_type,
             'timeout': cfg.CONF.http_timeout,
-            'service_type': cfg.CONF.service_types.neutron,
+            'service_type': cfg.CONF.service_types.heat,
         }
 
         if conf.os_tenant_id:
@@ -66,7 +74,7 @@ class Client(object):
         else:
             params['tenant_name'] = conf.os_tenant_name
 
-        self.client = heat_client.Client(**params)
+        self.client = heat_client.Client(api_version, endpoint, **params)
 
     @logged
     def ec2_instance_get_all(self):
