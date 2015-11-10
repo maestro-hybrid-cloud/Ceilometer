@@ -19,7 +19,7 @@ from ceilometer.openstack.common import log
 
 SERVICE_OPTS = [
     cfg.StrOpt('heat',
-               default='ochestration',
+               default='orchestration',
                help='Heat service type.'),
 ]
 
