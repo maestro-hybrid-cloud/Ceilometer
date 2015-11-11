@@ -27,20 +27,24 @@ LOG = log.getLogger(__name__)
 
 class CloudWatchInspector(virt_inspector.Inspector):
     def inspect_cpu_util(self, instance, duration=None):
+        duration = int(duration) if duration else 60
+
         end = datetime.datetime.utcnow()
         start = end - datetime.timedelta(seconds=duration)
 
         cw = boto.ec2.cloudwatch.CloudWatchConnection()
 
         statistics = cw.get_metric_statistics(
-            period=60,
+            period=duration,
             start_time=start,
             end_time=end,
             metric_name='CPUUtilization',
             namespace='AWS/EC2',
             statistics=['Average'],
-            dimensions={'InstanceId':[instance.id]}
+            dimensions={'InstanceId':[instance.ec2_id]}
         )
 
-        utils = statistics[len(statistics) - 1].get('Maximum')
+        index = len(statistics) - 1
+        utils = statistics[index].get('Maximum') if index >= 0 else 0
+
         return virt_inspector.CPUUtilStats(util=utils)

@@ -46,7 +46,7 @@ class CPUUtilPollster(AWSEC2PollsterBase):
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
-            LOG.debug(_('Checking CPU util for AWS EC2 instance %s'), instance.id)
+            LOG.debug(_('Checking CPU util for AWS EC2 instance %s'), instance.ec2_id)
             try:
                 cpu_info = self.inspector.inspect_cpu_util(
                     instance, self._inspection_duration)
@@ -62,4 +62,4 @@ class CPUUtilPollster(AWSEC2PollsterBase):
                 )
             except Exception as err:
                 LOG.exception(_('Could not get CPU Util for %(id)s: %(e)s'),
-                              {'id': instance.id, 'e': err})
+                              {'id': instance.ec2_id, 'e': err})
