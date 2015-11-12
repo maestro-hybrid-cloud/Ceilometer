@@ -16,13 +16,13 @@
 
 from oslo_utils import timeutils
 
+from ceilometer.compute import util as compute_util
 from ceilometer import sample
 
 def make_sample_from_ec2_instance(ec2_instance, name, type, unit, volume,
                               resource_id=None, additional_metadata=None):
     additional_metadata = additional_metadata or {}
-    resource_metadata = ec2_instance.metadata
-    resource_metadata.update(additional_metadata)
+    resource_metadata = compute_util.add_reserved_user_metadata(ec2_instance.metadata, additional_metadata)
     return sample.Sample(
         name=name,
         type=type,
