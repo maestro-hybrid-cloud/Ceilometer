@@ -30,7 +30,7 @@ def make_sample_from_ec2_instance(ec2_instance, name, type, unit, volume,
         volume=volume,
         user_id=ec2_instance.user_id,
         project_id=ec2_instance.tenant_id,
-        resource_id=resource_id or ec2_instance.id,
+        resource_id=resource_id or ec2_instance.ec2_id,
         timestamp=timeutils.isotime(),
         resource_metadata=resource_metadata,
     )
