@@ -163,7 +163,7 @@ class Client(object):
             resources = self.get_all_resources(stack_identifier, nested_depth=3)
 
             for resource in resources:
-                if resource.resource_type == 'OS::Heat::EC2Instance':
+                if resource.resource_type == 'AWS::VPC::EC2Instance':
                     for link in resource.links:
                         if link['rel'] == 'stack':
                             stack_url_path = urlparse(link['href']).path
